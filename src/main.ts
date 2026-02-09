@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,8 +13,21 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (errors) => {
+        const messages = errors.map((error) => {
+          const constraints = Object.values(error.constraints || {});
+          return `${error.property}: ${constraints.join(', ')}`;
+        });
+        return new BadRequestException({
+          message: '请求参数验证失败',
+          errors: messages,
+        });
+      },
     }),
   );
+
+  // 全局异常过滤器
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // 获取配置服务
   const configService = app.get(ConfigService);
