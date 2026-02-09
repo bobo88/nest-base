@@ -10,6 +10,27 @@ export interface DatabaseConfig {
   database: string;
 }
 
+export interface TypeOrmConfig {
+  type: 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mongodb';
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+  synchronize: boolean;
+  logging: boolean;
+  entities: string[];
+  migrations: string[];
+  migrationsRun: boolean;
+  cli: {
+    migrationsDir: string;
+  };
+  retryAttempts: number;
+  retryDelay: number;
+  timezone: string;
+  charset: string;
+}
+
 export interface RedisConfig {
   url: string;
   host: string;
@@ -50,6 +71,7 @@ export class ConfigService {
       'mysql://user:password@localhost:3306/db',
     );
     const url = new URL(dbUrl);
+    console.log('============DB URL============', dbUrl, url);
 
     return {
       url: dbUrl,
@@ -58,6 +80,33 @@ export class ConfigService {
       username: url.username,
       password: url.password,
       database: url.pathname.replace('/', ''),
+    };
+  }
+
+  // TypeORM配置
+  get typeorm(): TypeOrmConfig {
+    const dbConfig = this.database;
+    const isDevelopment = this.app.isDevelopment;
+
+    return {
+      type: 'mysql',
+      host: dbConfig.host,
+      port: dbConfig.port,
+      username: dbConfig.username,
+      password: dbConfig.password,
+      database: dbConfig.database,
+      synchronize: isDevelopment, // 开发环境自动同步
+      logging: isDevelopment, // 开发环境启用日志
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+      migrationsRun: !isDevelopment, // 生产环境运行迁移
+      cli: {
+        migrationsDir: 'src/migrations',
+      },
+      retryAttempts: 10,
+      retryDelay: 3000,
+      timezone: '+08:00',
+      charset: 'utf8mb4',
     };
   }
 
