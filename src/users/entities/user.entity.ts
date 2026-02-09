@@ -1,12 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  email: string;
+  // @Column({ unique: true })
+  // email: string;
 
   @Column()
   username: string;
@@ -23,16 +29,16 @@ export class User {
   @Column({ type: 'text', nullable: true })
   bio: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
   // 软删除字段
   @Column({ default: false })
   isDeleted: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'deletedAt' })
   deletedAt: Date;
 }

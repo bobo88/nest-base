@@ -11,11 +11,8 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import type {
-  UsersService,
-  CreateUserDto,
-  UpdateUserDto,
-} from './users.service';
+import { UsersService } from './users.service';
+import type { CreateUserDto, UpdateUserDto } from './users.service';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
