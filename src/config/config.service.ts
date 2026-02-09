@@ -45,9 +45,12 @@ export class ConfigService {
 
   // 数据库配置
   get database(): DatabaseConfig {
-    const dbUrl = this.configService.get<string>('DATABASE_URL', 'mysql://user:password@localhost:3306/db');
+    const dbUrl = this.configService.get<string>(
+      'DATABASE_URL',
+      'mysql://user:password@localhost:3306/db',
+    );
     const url = new URL(dbUrl);
-    
+
     return {
       url: dbUrl,
       host: url.hostname,
@@ -60,9 +63,12 @@ export class ConfigService {
 
   // Redis配置
   get redis(): RedisConfig {
-    const redisUrl = this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
+    const redisUrl = this.configService.get<string>(
+      'REDIS_URL',
+      'redis://localhost:6379',
+    );
     const url = new URL(redisUrl);
-    
+
     return {
       url: redisUrl,
       host: url.hostname,
@@ -80,7 +86,7 @@ export class ConfigService {
 
   // 获取环境变量（通用方法）
   get<T = any>(key: string, defaultValue?: T): T {
-    return this.configService.get<T>(key, defaultValue);
+    return this.configService.get<T>(key, defaultValue as any) as T;
   }
 
   // 检查环境变量是否存在
@@ -90,7 +96,7 @@ export class ConfigService {
 
   // 验证必需的环境变量
   validateRequired(keys: string[]): void {
-    const missingKeys = keys.filter(key => !this.has(key));
+    const missingKeys = keys.filter((key) => !this.has(key));
     if (missingKeys.length > 0) {
       throw new Error(`缺少必需的环境变量: ${missingKeys.join(', ')}`);
     }
